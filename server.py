@@ -22,7 +22,7 @@ class Config:
  
 #Gets client IP address from output of Socket(), checks if received IP address
 #matches with any pre-configured IP in xml.config, then assigns the email address
-#corresponding to received IP. Royal pain in my ***        
+#corresponding to received IP. Royal pain in my a$$.        
 def clientEmail():
     import xml.etree.cElementTree as ET
     tree = ET.parse('config.xml')
@@ -39,7 +39,8 @@ def clientEmail():
             if statIP==root[1][1].text:
                 clientEmail = root[1][0].text
             if statIP==root[2][1].text:
-                clientEmail = root[2][0].text            
+                clientEmail = root[2][0].text 
+    print clientEmail
     return clientEmail
            
 #Creates server socket and receives data from client
@@ -63,13 +64,18 @@ def Socket():
 #Send email over smtp when sys stats reach certain threshold
 def smtp():
     import smtplib
+    stat = Socket()
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.starttls()
-    server.login(Config.userName,Config.password)
-    try:
-        server.sendmail(Config.email, [Config.email],'test')
-    finally:
-        server.quit()
+    if (stat[2] or stat[3]) >= 50:
+        email = clientEmail()
+        username = raw_input('Enter username :' )
+        password = raw_input('Enter password :' )
+        server.login(username,password)
+        try:
+            server.sendmail(Config.email, [email],'test')
+        finally:
+            server.quit()
       
 #Create a db and store values received from client           
 def sql():
@@ -87,5 +93,5 @@ if __name__ == "__main__":
     
     Socket()
     sql()
-    #smtp()
+    smtp()
     clientEmail()
